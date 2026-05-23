@@ -98,7 +98,7 @@ The final expression can be easily calculated in a vectorized manner in python.
 
 - Find the upper hull $$u_k (x)$$ where $$u_k (x) = h(x_j) + (x - x_j)h'(x_j)$$ for $$x\in [z_{j-1}, z_j]$$ for each $$j\in$${ $$1, ..., k$$} and $$z_0 =\inf D$$ (or $$-\infty$$ if $$D$$ is unbounded on the left) and $$z_k =\sup D$$ (or $$\infty$$ if $$D$$ is unbounded on the right)
 
-- Find $$s_k (x) =\frac{\exp u_k (x)}{\int_D\exp u_k (t)\:dt}$$
+- Find $$s_k (x) =\frac{\exp u_k (x)}{\int_D\exp u_k (t)dt}$$
 
 - Find the lower hull $$l_k (x)$$ where $$l_k (x) =\frac{(x_{j+1} - x)h(x_j) + (x - x_j)h(x_{j+1})}{x_{j+1} - x_j}$$ for $$x\in [x_j, x_{j+1}]$$ for each $$j\in$${ $$1, ..., k-1$$}. Then for $$x < x_1$$ or $$x > x_k$$ we define $$l_k (x) =-\infty$$
 
@@ -148,37 +148,37 @@ After we have the mode we can just take $$k$$ linearly spaced points centered ar
 
 The next thing to note is that we need to sample $$x^{(cand)}$$ from $$s_k (x)$$ so we need to develop a method of doing that. Such a method is described below:
 
-Clearly $$s_k (x) =\frac{\exp u_k (x)}{\int_D\exp u_k (t)\:dt}$$ is a piecewise function. So we can first sample a categorical variable that tells us which range to choose from. Then based on that we can sample from inside that range.
+Clearly $$s_k (x) =\frac{\exp u_k (x)}{\int_D\exp u_k (t) dt}$$ is a piecewise function. So we can first sample a categorical variable that tells us which range to choose from. Then based on that we can sample from inside that range.
 
 #### Sampling The Range
 
 Define range $$j$$ to be $$R_j = [z_{j-1}, z_j]$$ for each $$j\in$${ $$1, ..., k$$}. Then
 
-$$\mathbb{P}[x^{(cand)}\in R_j] =\int_{R_j}\frac{\exp u_k (x)}{\int_D\exp u_k (t)\:dt}\:dx$$
+$$\mathbb{P}[x^{(cand)}\in R_j] =\int_{R_j}\frac{\exp u_k (x)}{\int_D\exp u_k (t) dt} dx$$
 
 First note that $$\bigcup_j R_j = D$$. Now we will evaluate simpler integrals.
 
-$$\int_{R_j}\exp u_k (x)\:dx =\int_{z_{j-1}}^{z_j}\exp (h(x_j) + (x-x_j) h'(x_j))\:dx =\exp (h(x_j) - x_j h'(x_j))\int_{z_{j-1}}^{z_j}\exp (xh'(x_j))\:dx$$
+$$\int_{R_j}\exp u_k (x) dx =\int_{z_{j-1}}^{z_j}\exp (h(x_j) + (x-x_j) h'(x_j)) dx =\exp (h(x_j) - x_j h'(x_j))\int_{z_{j-1}}^{z_j}\exp (xh'(x_j)) dx$$
 
 Now there are two cases $$h'(x_j) = 0$$ vs $$h'(x_j)\neq 0$$.
 
 - **First if** $$h'(x_j) = 0$$:
 
-$$\int_{R_j}\exp u_k (x)\:dx =\exp (h(x_j) - x_j h'(x_j))\int_{z_{j-1}}^{z_j}\exp (xh'(x_j))\:dx =\exp h(x_j)\int_{z_{j-1}}^{z_j} 1\:dx = (z_j - z_{j-1})\exp h(x_j)$$
+$$\int_{R_j}\exp u_k (x) dx =\exp (h(x_j) - x_j h'(x_j))\int_{z_{j-1}}^{z_j}\exp (xh'(x_j)) dx =\exp h(x_j)\int_{z_{j-1}}^{z_j} 1 dx = (z_j - z_{j-1})\exp h(x_j)$$
 
 - **Now if** $$h'(x_j)\neq 0$$:
 
-$$\int_{R_j}\exp u_k (x)\:dx =\exp (h(x_j) - x_j h'(x_j))\int_{z_{j-1}}^{z_j}\exp (xh'(x_j))\:dx =\exp (h(x_j) - x_j h'(x_j))\left(\frac{1}{h'(x_j)}\exp (xh'(x_j))\Big{|}_{z_{j-1}}^{z_j}\right)$$
+$$\int_{R_j}\exp u_k (x) dx =\exp (h(x_j) - x_j h'(x_j))\int_{z_{j-1}}^{z_j}\exp (xh'(x_j)) dx =\exp (h(x_j) - x_j h'(x_j))\left(\frac{1}{h'(x_j)}\exp (xh'(x_j))\Big{|}_{z_{j-1}}^{z_j}\right)$$
 
 $$=\exp (h(x_j) - x_j h'(x_j))\left(\frac{\exp (z_j h'(x_j)) -\exp (z_{j-1} h'(x_j))}{h'(x_j)}\right)$$
 
-Quickly note that $$\int_D\exp u_k (t)\:dt =\sum_{j=1}^k\int_{R_j}\exp u_k (x)\:dx$$
+Quickly note that $$\int_D\exp u_k (t) dt =\sum_{j=1}^k\int_{R_j}\exp u_k (x) dx$$
 
-Therefore if we let $$w_j =\int_{R_j}\exp u_k (x)\:dx$$ we see that:
+Therefore if we let $$w_j =\int_{R_j}\exp u_k (x) dx$$ we see that:
 
-$$\mathbb{P}[x^{(cand)}\in R_j] =\int_{R_j}\frac{\exp u_k (x)}{\int_D\exp u_k (t)\:dt}\:dx =\frac{1}{\int_D\exp u_k (t)\:dt}\int_{R_j}\exp u_k (x)\:dx$$
+$$\mathbb{P}[x^{(cand)}\in R_j] =\int_{R_j}\frac{\exp u_k (x)}{\int_D\exp u_k (t) dt} dx =\frac{1}{\int_D\exp u_k (t) dt}\int_{R_j}\exp u_k (x) dx$$
 
-$$=\frac{1}{\sum_{m=1}^k\int_{R_m}\exp u_k (x)\:dx}\int_{R_j}\exp u_k (x)\:dx =\frac{w_j}{\sum_{m=1}^k w_m} = p_j$$
+$$=\frac{1}{\sum_{m=1}^k\int_{R_m}\exp u_k (x) dx}\int_{R_j}\exp u_k (x) dx =\frac{w_j}{\sum_{m=1}^k w_m} = p_j$$
 
 Now we know how to sample from a probability vector like this, there are $$k$$ possible outcomes we need to choose one. So we have successfully sampled from the ranges.
 
@@ -196,7 +196,7 @@ If $$h'(x_j) = 0$$ this is clearly a uniform random variable over $$[z_{j-1}, z_
 
 If $$h'(x_j)\neq 0$$ we get the following CDF for $$x^{(cand)} | x^{(cand)}\in R_j$$:
 
-$$F(x) =\int_{z_{j-1}}^x \frac{\exp (h(x_j) + (x-x_j) h'(x_j))}{w_j}\:dx =\frac{\exp (h(x_j) - x_j h'(x_j))}{w_j}\int_{z_{j-1}}^x\exp (xh'(x_j))\:dx$$
+$$F(x) =\int_{z_{j-1}}^x \frac{\exp (h(x_j) + (x-x_j) h'(x_j))}{w_j} dx =\frac{\exp (h(x_j) - x_j h'(x_j))}{w_j}\int_{z_{j-1}}^x\exp (xh'(x_j)) dx$$
 
 $$=\frac{\exp (h(x_j) - x_j h'(x_j))}{w_j}\left(\frac{1}{h'(x_j)}\exp (xh'(x_j))\Big{|}_{z_{j-1}}^x\right)$$
 
@@ -527,11 +527,11 @@ Is the variance of $$\zeta$$.
 
 Let $$g(y)=\sup$${ $$x\geq 0:\zeta(x)\geq y$$} then clearly $$g$$ is non-increasing and by Fubini's Theorem
 
-$$1=\int_0^\infty\zeta(x)dx=\int_0^\infty\int_0^{\zeta(x)}dy\:dx=\int_0^{\zeta(0)}\int_0^{g(y)}dx\:dy=\int_0^{\zeta(0)}g(y)dy$$
+$$1=\int_0^\infty\zeta(x)dx=\int_0^\infty\int_0^{\zeta(x)} dy dx=\int_0^{\zeta(0)}\int_0^{g(y)} dx dy=\int_0^{\zeta(0)}g(y)dy$$
 
-$$\delta=\int_0^\infty x\zeta(x)dx=\int_0^\infty\int_0^{\zeta(x)}x\:dy\:dx=\int_0^{\zeta(0)}\int_0^{g(y)}x\:dx\:dy=\int_0^{\zeta(0)}\frac{(g(y))^2}{2}dy$$
+$$\delta=\int_0^\infty x\zeta(x)dx=\int_0^\infty\int_0^{\zeta(x)}x dy dx=\int_0^{\zeta(0)}\int_0^{g(y)}x dx dy=\int_0^{\zeta(0)}\frac{(g(y))^2}{2}dy$$
 
-$$\delta^2+\sigma^2=\int_0^\infty x^2\zeta(x)dx=\int_0^\infty\int_0^{\zeta(x)}x^2\:dy\:dx=\int_0^{\zeta(0)}\int_0^{g(y)}x^2\:dx\:dy=\int_0^{\zeta(0)}\frac{(g(y))^3}{3}dy$$
+$$\delta^2+\sigma^2=\int_0^\infty x^2\zeta(x)dx=\int_0^\infty\int_0^{\zeta(x)}x^2 dy dx=\int_0^{\zeta(0)}\int_0^{g(y)}x^2 dx dy=\int_0^{\zeta(0)}\frac{(g(y))^3}{3}dy$$
 
 So we want to maximize
 
@@ -539,7 +539,7 @@ $$|\mu-M|=\mu-M=\delta=\int_0^{\zeta(0)}\frac{(g(y))^2}{2}dy$$
 
 Subject to the constraints
 
-$$1=\int_0^{\zeta(0)}g(y)\:dy\hspace{3cm}\delta^2+\sigma^2=\int_0^{\zeta(0)}\frac{(g(y))^3}{3}dy$$
+$$1=\int_0^{\zeta(0)}g(y) dy\hspace{3cm}\delta^2+\sigma^2=\int_0^{\zeta(0)}\frac{(g(y))^3}{3}dy$$
 
 We know by Hölder's Inequality with $$p=q=2$$ that
 
@@ -567,11 +567,11 @@ The inequality becomes an equality if and only if $$g=\left|g^{1/2}\right|^2=c\l
 
 The variance of a Uniform($$a$$, $$b$$) distribution is $$\frac{1}{12}(b-a)^2$$. Here we are setting $$a=0$$ and constraining variance to $$\sigma^2$$ so $$\frac{1}{12}b^2=\sigma^2$$ and hence $$b=\sigma\sqrt{12}$$. The density is then $$\zeta(x)=\frac{1}{\sigma\sqrt{12}}$$ for $$x\in[0,\sigma\sqrt{12}]$$ and 0 elsewhere. Therefore $$g(y)=\sup$${ $$x\geq 0:\zeta(x)\geq y$$} $$=\sigma\sqrt{12}$$ for $$y\leq\frac{1}{\sigma\sqrt{12}}=\zeta(0)=f(M)$$. Checking that the conditions are met we see
 
-$$\int_0^\frac{1}{\sigma\sqrt{12}}g(y)dy=\int_0^\frac{1}{\sigma\sqrt{12}}\sigma\sqrt{12}\:dy=1$$
+$$\int_0^\frac{1}{\sigma\sqrt{12}}g(y)dy=\int_0^\frac{1}{\sigma\sqrt{12}}\sigma\sqrt{12} dy=1$$
 
-$$\int_0^\frac{1}{\sigma\sqrt{12}}\frac{(g(y))^2}{2}dy=\int_0^\frac{1}{\sigma\sqrt{12}}6\sigma^2\:dy=\frac{6\sigma^2}{\sigma\sqrt{12}}=\frac{3\sigma}{\sqrt{3}}=\sigma\sqrt{3}=\mu'=\mu-M=|\mu-M|$$
+$$\int_0^\frac{1}{\sigma\sqrt{12}}\frac{(g(y))^2}{2}dy=\int_0^\frac{1}{\sigma\sqrt{12}}6\sigma^2 dy=\frac{6\sigma^2}{\sigma\sqrt{12}}=\frac{3\sigma}{\sqrt{3}}=\sigma\sqrt{3}=\mu'=\mu-M=|\mu-M|$$
 
-$$\int_0^\frac{1}{\sigma\sqrt{12}}\frac{(g(y))^3}{3}dy=\int_0^\frac{1}{\sigma\sqrt{12}}4\sigma^3\sqrt{12}\:dy=4\sigma^2=(\sigma\sqrt{3})^2+\sigma^2=(\mu')^2+\sigma^2$$
+$$\int_0^\frac{1}{\sigma\sqrt{12}}\frac{(g(y))^3}{3}dy=\int_0^\frac{1}{\sigma\sqrt{12}}4\sigma^3\sqrt{12} dy=4\sigma^2=(\sigma\sqrt{3})^2+\sigma^2=(\mu')^2+\sigma^2$$
 
 The same result holds for any uniform distribution as well, for simplicity this case assumed the left bound was 0.
 
